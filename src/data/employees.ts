@@ -55,5 +55,5 @@ export const employees: Employee[] = [
     phone: "780-555-0165",
     branchId: "2"
   }
-  // Note: Adding first 5 employees as sample. More can be added as needed.
+ 
 ];
