@@ -105,3 +105,69 @@ describe("Employee API Endpoints", () => {
     });
   });
 });
+
+describe("Employee Logical Operations API Endpoints", () => {
+  describe("GET /api/v1/branches/:branchId/employees", () => {
+    it("should return all employees for a specific branch successfully", async () => {
+      const response = await request(app)
+        .get("/api/v1/branches/1/employees")
+        .expect(200);
+
+      expect(response.body).toHaveProperty("message", "Employees for branch 1 retrieved successfully");
+      expect(Array.isArray(response.body.data)).toBe(true);
+      
+      // Verify all returned employees belong to branch 1
+      response.body.data.forEach((employee: any) => {
+        expect(employee).toHaveProperty("branchId", "1");
+      });
+    });
+
+    it("should return 400 when branch ID parameter is missing", async () => {
+      const response = await request(app)
+        .get("/api/v1/branches//employees") // Missing branchId
+        .expect(400);
+
+      expect(response.body).toHaveProperty("message", "Branch ID parameter is required");
+    });
+
+    it("should return empty array for non-existent branch ID", async () => {
+      const response = await request(app)
+        .get("/api/v1/branches/999/employees")
+        .expect(200);
+
+      expect(response.body.data).toEqual([]);
+    });
+  });
+
+  describe("GET /api/v1/departments/:department/employees", () => {
+    it("should return all employees for a specific department successfully", async () => {
+      const response = await request(app)
+        .get("/api/v1/departments/Management/employees")
+        .expect(200);
+
+      expect(response.body).toHaveProperty("message", "Employees in department Management retrieved successfully");
+      expect(Array.isArray(response.body.data)).toBe(true);
+      
+      // Verify all returned employees belong to Management department
+      response.body.data.forEach((employee: any) => {
+        expect(employee.department.toLowerCase()).toBe("management");
+      });
+    });
+
+    it("should return 400 when department parameter is missing", async () => {
+      const response = await request(app)
+        .get("/api/v1/departments//employees") // Missing department
+        .expect(400);
+
+      expect(response.body).toHaveProperty("message", "Department parameter is required");
+    });
+
+    it("should handle case-insensitive department names", async () => {
+      const response = await request(app)
+        .get("/api/v1/departments/managEMENT/employees")
+        .expect(200);
+
+      expect(Array.isArray(response.body.data)).toBe(true);
+    });
+  });
+});
