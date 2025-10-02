@@ -9,6 +9,7 @@
         "outDir": "./dist",
         "resolveJsonModule": true,
         "noImplicitAny": true,
+        "moduleResolution": "node",
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
         "noImplicitThis": true,
