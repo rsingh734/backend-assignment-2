@@ -124,7 +124,7 @@ describe("Employee Logical Operations API Endpoints", () => {
 
     it("should return 400 when branch ID parameter is missing", async () => {
       const response = await request(app)
-        .get("/api/v1/branches//employees") // Missing branchId
+        .get("/api/v1/branches/%20/employees") 
         .expect(400);
 
       expect(response.body).toHaveProperty("message", "Branch ID parameter is required");
@@ -156,7 +156,7 @@ describe("Employee Logical Operations API Endpoints", () => {
 
     it("should return 400 when department parameter is missing", async () => {
       const response = await request(app)
-        .get("/api/v1/departments//employees") // Missing department
+        .get("/api/v1/departments/%20/employees") 
         .expect(400);
 
       expect(response.body).toHaveProperty("message", "Department parameter is required");

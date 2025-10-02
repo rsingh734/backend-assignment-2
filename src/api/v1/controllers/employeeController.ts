@@ -119,7 +119,7 @@ export const getEmployeesByBranch = (req: Request, res: Response): void => {
   try {
     const { branchId } = req.params;
     
-    if (!branchId) {
+     if (!branchId || branchId.trim() === "") {
       res.status(HTTP_STATUS.BAD_REQUEST).json({
         message: "Branch ID parameter is required",
       });
@@ -143,7 +143,7 @@ export const getEmployeesByDepartment = (req: Request, res: Response): void => {
   try {
     const { department } = req.params;
     
-    if (!department) {
+    if (!department || department.trim() === "") {
       res.status(HTTP_STATUS.BAD_REQUEST).json({
         message: "Department parameter is required",
       });
