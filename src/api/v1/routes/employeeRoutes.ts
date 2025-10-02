@@ -6,6 +6,8 @@ import {
   createEmployee,
   updateEmployee,
   deleteEmployee,
+  getEmployeesByBranch,      
+  getEmployeesByDepartment, 
 } from "../controllers/employeeController";
 
 const router: Router = express.Router();
@@ -15,5 +17,7 @@ router.get("/employees/:id", getEmployeeById);
 router.post("/employees", createEmployee);
 router.put("/employees/:id", updateEmployee);
 router.delete("/employees/:id", deleteEmployee);
+router.get("/branches/:branchId/employees", getEmployeesByBranch);
+router.get("/departments/:department/employees", getEmployeesByDepartment);
 
 export default router;
