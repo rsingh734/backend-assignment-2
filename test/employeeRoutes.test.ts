@@ -8,7 +8,7 @@ describe("Employee API Endpoints", () => {
     position: "Test Position",
     department: "Test Department",
     email: "test@example.com",
-    phone: "555-1234",
+    phone: "555-123-9999",
     branchId: "1"
   };
 
@@ -27,10 +27,11 @@ describe("Employee API Endpoints", () => {
     it("should return 400 when required parameters are missing", async () => {
       const response = await request(app)
         .post("/api/v1/employees")
-        .send({ name: "Incomplete Employee" })
+        .send({ name: "Incomplete Employee", position: "Tester" })
         .expect(400);
 
       expect(response.body).toHaveProperty("message");
+      expect(response.body).toHaveProperty("errors");
     });
   });
 
