@@ -42,13 +42,6 @@ export const createBranch = (req: Request, res: Response): void => {
   try {
     const { name, address, phone } = req.body;
 
-    if (!name || !address || !phone) {
-      res.status(HTTP_STATUS.BAD_REQUEST).json({
-        message: "All fields are required: name, address, phone",
-      });
-      return;
-    }
-
     const newBranch = branchService.createBranch({
       name,
       address,

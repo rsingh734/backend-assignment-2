@@ -42,14 +42,7 @@ export const getEmployeeById = (req: Request, res: Response): void => {
 export const createEmployee = (req: Request, res: Response): void => {
   try {
     const { name, position, department, email, phone, branchId } = req.body;
-
-    if (!name || !position || !department || !email || !phone || !branchId) {
-      res.status(HTTP_STATUS.BAD_REQUEST).json({
-        message: "All fields are required: name, position, department, email, phone, branchId",
-      });
-      return;
-    }
-
+    
     const newEmployee = employeeService.createEmployee({
       name,
       position,
