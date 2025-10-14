@@ -1,157 +1,152 @@
-// src/api/v1/controllers/employeeController.ts
-import { Request, Response } from "express";
-import { HTTP_STATUS } from "../../../constants/httpConstants";
+import { Request, Response, NextFunction } from "express";
 import * as employeeService from "../services/employeeServices";
+import { successResponse, errorResponse } from "../models/responsemodel";
+import { Employee } from "../models/employeeModel";
+import { createEmployeeSchema, updateEmployeeSchema } from "../validation/employeeValidators";
 
-export const getAllEmployees = (req: Request, res: Response): void => {
-  try {
-    const employees = employeeService.getAllEmployees();
-    res.status(HTTP_STATUS.OK).json({
-      message: "Employees retrieved successfully",
-      data: employees,
-    });
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to retrieve employees",
-    });
-  }
-};
 
-export const getEmployeeById = (req: Request, res: Response): void => {
-  try {
-    const { id } = req.params;
-    const employee = employeeService.getEmployeeById(id);
-    
-    if (employee) {
-      res.status(HTTP_STATUS.OK).json({
-        message: "Employee found",
-        data: employee,
-      });
-    } else {
-      res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "Employee not found",
-      });
+export const getAllEmployees = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const employees = employeeService.getAllEmployees();
+        res.status(200).json(successResponse(employees, "Employees retrieved successfully"));
+    } catch (error: unknown) {
+        next(error);
     }
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to retrieve employee",
-    });
-  }
 };
 
-export const createEmployee = (req: Request, res: Response): void => {
-  try {
-    const { name, position, department, email, phone, branchId } = req.body;
-    
-    const newEmployee = employeeService.createEmployee({
-      name,
-      position,
-      department,
-      email,
-      phone,
-      branchId,
-    });
-
-    res.status(HTTP_STATUS.CREATED).json({
-      message: "Employee created successfully",
-      data: newEmployee,
-    });
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to create employee",
-    });
-  }
-};
-
-export const updateEmployee = (req: Request, res: Response): void => {
-  try {
-    const { id } = req.params;
-    const updateData = req.body;
-
-    const updatedEmployee = employeeService.updateEmployee(id, updateData);
-    
-    if (updatedEmployee) {
-      res.status(HTTP_STATUS.OK).json({
-        message: "Employee updated successfully",
-        data: updatedEmployee,
-      });
-    } else {
-      res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "Employee not found",
-      });
+export const getEmployeeById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const employee = employeeService.getEmployeeById(id);
+        
+        if (employee) {
+            res.status(200).json(successResponse(employee, "Employee found"));
+        } else {
+            res.status(404).json(errorResponse("NOT_FOUND", "Employee not found"));
+        }
+    } catch (error: unknown) {
+        next(error);
     }
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to update employee",
-    });
-  }
 };
 
-export const deleteEmployee = (req: Request, res: Response): void => {
-  try {
-    const { id } = req.params;
-    const result = employeeService.deleteEmployee(id);
-    
-    if (result) {
-      res.status(HTTP_STATUS.OK).json({
-        message: "Employee deleted successfully",
-      });
-    } else {
-      res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "Employee not found",
-      });
+export const createEmployee = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { error } = createEmployeeSchema.validate(req.body, { abortEarly: false });
+  
+        if (error) {
+            res.status(400).json(errorResponse(
+                "VALIDATION_ERROR", 
+                "Validation failed",
+                error.details.map(d => d.message).join(", ")
+            ));
+            return;
+        }
+        
+        const employeeData: Employee = req.body;
+        const newEmployee = employeeService.createEmployee(employeeData);
+        res.status(201).json(successResponse(newEmployee, "Employee created successfully"));
+    } catch (error: unknown) {
+        next(error);
     }
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to delete employee",
-    });
-  }
 };
 
-export const getEmployeesByBranch = (req: Request, res: Response): void => {
-  try {
-    const { branchId } = req.params;
-    
-     if (!branchId || branchId.trim() === "") {
-      res.status(HTTP_STATUS.BAD_REQUEST).json({
-        message: "Branch ID parameter is required",
-      });
-      return;
+export const updateEmployee = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { error } = updateEmployeeSchema.validate(req.body, { abortEarly: false });
+  
+        if (error) {
+            res.status(400).json(errorResponse(
+                "VALIDATION_ERROR", 
+                "Validation failed",
+                error.details.map(d => d.message).join(", ")
+            ));
+            return;
+        }
+           
+        const { id } = req.params;
+        const updatedEmployee = employeeService.updateEmployee(id, req.body);
+        
+        if (updatedEmployee) {
+            res.status(200).json(successResponse(updatedEmployee, "Employee updated successfully"));
+        } else {
+            res.status(404).json(errorResponse("NOT_FOUND", "Employee not found"));
+        }
+    } catch (error: unknown) {
+        next(error);
     }
-
-    const employees = employeeService.getEmployeesByBranch(branchId);
-    
-    res.status(HTTP_STATUS.OK).json({
-      message: `Employees for branch ${branchId} retrieved successfully`,
-      data: employees,
-    });
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to retrieve employees by branch",
-    });
-  }
 };
 
-export const getEmployeesByDepartment = (req: Request, res: Response): void => {
-  try {
-    const { department } = req.params;
-    
-    if (!department || department.trim() === "") {
-      res.status(HTTP_STATUS.BAD_REQUEST).json({
-        message: "Department parameter is required",
-      });
-      return;
+export const deleteEmployee = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const result = employeeService.deleteEmployee(id);
+        
+        if (result) {
+            res.status(200).json(successResponse({}, "Employee deleted successfully"));
+        } else {
+            res.status(404).json(errorResponse("NOT_FOUND", "Employee not found"));
+        }
+    } catch (error: unknown) {
+        next(error);
     }
+};
 
-    const employees = employeeService.getEmployeesByDepartment(department);
-    
-    res.status(HTTP_STATUS.OK).json({
-      message: `Employees in department ${department} retrieved successfully`,
-      data: employees,
-    });
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to retrieve employees by department",
-    });
-  }
+export const getEmployeesByBranch = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { branchId } = req.params;
+        
+        if (!branchId || branchId.trim() === "") {
+            res.status(400).json(errorResponse("BAD_REQUEST", "Branch ID parameter is required"));
+            return;
+        }
+
+        const employees = employeeService.getEmployeesByBranch(branchId);
+        res.status(200).json(successResponse(employees, `Employees for branch ${branchId} retrieved successfully`));
+    } catch (error: unknown) {
+        next(error);
+    }
+};
+
+export const getEmployeesByDepartment = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { department } = req.params;
+        
+        if (!department || department.trim() === "") {
+            res.status(400).json(errorResponse("BAD_REQUEST", "Department parameter is required"));
+            return;
+        }
+
+        const employees = employeeService.getEmployeesByDepartment(department);
+        res.status(200).json(successResponse(employees, `Employees in department ${department} retrieved successfully`));
+    } catch (error: unknown) {
+        next(error);
+    }
 };
