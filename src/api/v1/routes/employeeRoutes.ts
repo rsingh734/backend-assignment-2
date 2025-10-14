@@ -10,11 +10,14 @@ import {
   getEmployeesByDepartment, 
 } from "../controllers/employeeController";
 
+import { validateRequest } from "../middleware/validationMiddleware";
+import { createEmployeeSchema, updateEmployeeSchema } from "../validation/employeeValidators";
+
 const router: Router = express.Router();
 
 router.get("/employees", getAllEmployees);
 router.get("/employees/:id", getEmployeeById);
-router.post("/employees", createEmployee);
+router.post("/employees", validateRequest(updateEmployeeSchema), validateRequest(createEmployeeSchema), createEmployee);
 router.put("/employees/:id", updateEmployee);
 router.delete("/employees/:id", deleteEmployee);
 router.get("/branches/:branchId/employees", getEmployeesByBranch);
