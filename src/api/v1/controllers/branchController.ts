@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as branchService from "../services/branchServices";
-import { successResponse, errorResponse } from "../models/responsemodel";
+import { successResponse, errorResponse } from "../models/responseModel";
 import { Branch } from "../models/branchModel";
 import { createBranchSchema, updateBranchSchema } from "../validation/branchValidators";
 
@@ -98,7 +98,7 @@ export const deleteBranch = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const result = branchService.deleteBranch(id);
+        const result = await branchService.deleteBranch(id);
         
         if (result) {
             res.status(200).json(successResponse({}, "Branch deleted successfully"));

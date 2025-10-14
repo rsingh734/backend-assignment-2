@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as employeeService from "../services/employeeServices";
-import { successResponse, errorResponse } from "../models/responsemodel";
+import { successResponse, errorResponse } from "../models/responseModel";
 import { Employee } from "../models/employeeModel";
 import { createEmployeeSchema, updateEmployeeSchema } from "../validation/employeeValidators";
 
@@ -99,9 +99,9 @@ export const deleteEmployee = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const result = employeeService.deleteEmployee(id);
+        const result = await employeeService.deleteEmployee(id);
         
-        if (result) {
+        if  (result) {
             res.status(200).json(successResponse({}, "Employee deleted successfully"));
         } else {
             res.status(404).json(errorResponse("NOT_FOUND", "Employee not found"));
