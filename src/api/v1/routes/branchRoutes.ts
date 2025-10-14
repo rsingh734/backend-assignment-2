@@ -9,10 +9,13 @@ import {
 
 const router: Router = express.Router();
 
+import { validateRequest } from "../middleware/validationMiddleware";
+import { createBranchSchema, updateBranchSchema } from "../validation/branchValidators";
+
 router.get("/branches", getAllBranches);
 router.get("/branches/:id", getBranchById);
-router.post("/branches", createBranch);
-router.put("/branches/:id", updateBranch);
+router.post("/branches", validateRequest(createBranchSchema), createBranch);
+router.put("/branches/:id", validateRequest(updateBranchSchema), updateBranch);
 router.delete("/branches/:id", deleteBranch);
 
 export default router;
