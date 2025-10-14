@@ -12,6 +12,25 @@ describe("Employee API Endpoints", () => {
     branchId: "1"
   };
 
+  let createdEmployeeId: string;
+  let createdEmployeeId2: string;
+
+  beforeAll(async () => {
+    // Create an employee for testing GET, PUT, DELETE
+    const createResponse = await request(app)
+      .post("/api/v1/employees")
+      .send(testEmployee)
+      .expect(201);
+    createdEmployeeId = createResponse.body.data.id;
+
+    // Create another employee for DELETE test
+    const createResponse2 = await request(app)
+      .post("/api/v1/employees")
+      .send({ ...testEmployee, name: "Test Employee 2" })
+      .expect(201);
+    createdEmployeeId2 = createResponse2.body.data.id;
+  });
+
   describe("POST /api/v1/employees", () => {
     it("should create a new employee successfully", async () => {
       const response = await request(app)
@@ -49,11 +68,11 @@ describe("Employee API Endpoints", () => {
   describe("GET /api/v1/employees/:id", () => {
     it("should return specific employee by ID", async () => {
       const response = await request(app)
-        .get("/api/v1/employees/1")
+        .get(`/api/v1/employees/${createdEmployeeId}`)
         .expect(200);
 
       expect(response.body).toHaveProperty("message", "Employee found");
-      expect(response.body.data).toHaveProperty("id", "1");
+      expect(response.body.data).toHaveProperty("id", createdEmployeeId);
     });
 
     it("should return 404 for non-existent employee ID", async () => {
@@ -68,9 +87,9 @@ describe("Employee API Endpoints", () => {
   describe("PUT /api/v1/employees/:id", () => {
     it("should update employee successfully", async () => {
       const updateData = { position: "Test Position", phone: "555-123-9999" };
-      
+
       const response = await request(app)
-        .put("/api/v1/employees/1")
+        .put(`/api/v1/employees/${createdEmployeeId}`)
         .send(updateData)
         .expect(200);
 
@@ -91,7 +110,7 @@ describe("Employee API Endpoints", () => {
   describe("DELETE /api/v1/employees/:id", () => {
     it("should delete employee successfully", async () => {
       const response = await request(app)
-        .delete("/api/v1/employees/2")
+        .delete(`/api/v1/employees/${createdEmployeeId2}`)
         .expect(200);
 
       expect(response.body).toHaveProperty("message", "Employee deleted successfully");

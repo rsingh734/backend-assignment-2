@@ -8,6 +8,25 @@ describe("Branch API Endpoints", () => {
     phone: "555-123-9999"
   };
 
+  let createdBranchId: string;
+  let createdBranchId2: string;
+
+  beforeAll(async () => {
+    // Create a branch for testing GET, PUT, DELETE
+    const createResponse = await request(app)
+      .post("/api/v1/branches")
+      .send(testBranch)
+      .expect(201);
+    createdBranchId = createResponse.body.data.id;
+
+    // Create another branch for DELETE test
+    const createResponse2 = await request(app)
+      .post("/api/v1/branches")
+      .send({ ...testBranch, name: "Test Branch 2" })
+      .expect(201);
+    createdBranchId2 = createResponse2.body.data.id;
+  });
+
   describe("POST /api/v1/branches", () => {
     it("should create a new branch successfully", async () => {
       const response = await request(app)
@@ -45,11 +64,11 @@ describe("Branch API Endpoints", () => {
   describe("GET /api/v1/branches/:id", () => {
     it("should return specific branch by ID", async () => {
       const response = await request(app)
-        .get("/api/v1/branches/1")
+        .get(`/api/v1/branches/${createdBranchId}`)
         .expect(200);
 
       expect(response.body).toHaveProperty("message", "Branch found");
-      expect(response.body.data).toHaveProperty("id", "1");
+      expect(response.body.data).toHaveProperty("id", createdBranchId);
     });
 
     it("should return 404 for non-existent branch ID", async () => {
@@ -63,13 +82,13 @@ describe("Branch API Endpoints", () => {
 
   describe("PUT /api/v1/branches/:id", () => {
     it("should update branch successfully", async () => {
-      const updateData = { 
-        name: "Vancouver Branch", 
-        phone: "604-456-0022" 
+      const updateData = {
+        name: "Vancouver Branch",
+        phone: "604-456-0022"
       };
-      
+
       const response = await request(app)
-        .put("/api/v1/branches/1")
+        .put(`/api/v1/branches/${createdBranchId}`)
         .send(updateData)
         .expect(200);
 
@@ -91,7 +110,7 @@ describe("Branch API Endpoints", () => {
   describe("DELETE /api/v1/branches/:id", () => {
     it("should delete branch successfully", async () => {
       const response = await request(app)
-        .delete("/api/v1/branches/2")
+        .delete(`/api/v1/branches/${createdBranchId2}`)
         .expect(200);
 
       expect(response.body).toHaveProperty("message", "Branch deleted successfully");
