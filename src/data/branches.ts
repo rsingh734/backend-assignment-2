@@ -11,7 +11,7 @@ export const branches: Branch[] = [
     id: "1",
     name: "Vancouver Branch",
     address: "1300 Burrard St, Vancouver, BC, V6Z 2C7",
-    phone: "604-456-0022"
+    phone: "555-999-0000"
   },
   {
     id: "2",

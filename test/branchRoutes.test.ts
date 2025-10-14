@@ -64,8 +64,8 @@ describe("Branch API Endpoints", () => {
   describe("PUT /api/v1/branches/:id", () => {
     it("should update branch successfully", async () => {
       const updateData = { 
-        name: "Updated Branch Name", 
-        phone: "555-999-0000" 
+        name: "Vancouver Branch", 
+        phone: "604-456-0022" 
       };
       
       const response = await request(app)

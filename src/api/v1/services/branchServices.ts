@@ -7,7 +7,15 @@ import {
 } from "../repositories/firestoreRepository";
 import { Branch } from "../models/branchModel";
 
-const COLLECTION_NAME = "branches";
+const COLLECTION_NAME = 'branches';
+
+export const createBranch = async (data: Omit<Branch, 'id'>): Promise<Branch> => {
+  try {
+    return await createDocument<Branch>(COLLECTION_NAME, data);
+  } catch (error) {
+    throw new Error(`Failed to create branch: ${error}`);
+  }
+};
 
 export const getAllBranches = async (): Promise<Branch[]> => {
   try {
@@ -22,14 +30,6 @@ export const getBranchById = async (id: string): Promise<Branch | null> => {
     return await getDocumentById<Branch>(COLLECTION_NAME, id);
   } catch (error) {
     throw new Error(`Failed to retrieve branch ${id}: ${error}`);
-  }
-};
-
-export const createBranch = async (data: Branch): Promise<Branch> => {
-  try {
-    return await createDocument<Branch>(COLLECTION_NAME, data);
-  } catch (error) {
-    throw new Error(`Failed to create branch: ${error}`);
   }
 };
 

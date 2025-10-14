@@ -7,6 +7,7 @@ import {
 } from "../repositories/firestoreRepository";
 import { Employee } from "../models/employeeModel";
 
+
 const COLLECTION_NAME = "employees";
 
 export const getAllEmployees = async (): Promise<Employee[]> => {

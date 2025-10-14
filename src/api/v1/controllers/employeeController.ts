@@ -11,7 +11,7 @@ export const getAllEmployees = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const employees = employeeService.getAllEmployees();
+        const employees = await employeeService.getAllEmployees();
         res.status(200).json(successResponse(employees, "Employees retrieved successfully"));
     } catch (error: unknown) {
         next(error);
@@ -25,8 +25,8 @@ export const getEmployeeById = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const employee = employeeService.getEmployeeById(id);
-        
+        const employee = await employeeService.getEmployeeById(id);
+
         if (employee) {
             res.status(200).json(successResponse(employee, "Employee found"));
         } else {
@@ -55,7 +55,7 @@ export const createEmployee = async (
         }
         
         const employeeData: Employee = req.body;
-        const newEmployee = employeeService.createEmployee(employeeData);
+        const newEmployee = await employeeService.createEmployee(employeeData);
         res.status(201).json(successResponse(newEmployee, "Employee created successfully"));
     } catch (error: unknown) {
         next(error);
@@ -80,8 +80,8 @@ export const updateEmployee = async (
         }
            
         const { id } = req.params;
-        const updatedEmployee = employeeService.updateEmployee(id, req.body);
-        
+        const updatedEmployee = await employeeService.updateEmployee(id, req.body);
+
         if (updatedEmployee) {
             res.status(200).json(successResponse(updatedEmployee, "Employee updated successfully"));
         } else {
@@ -124,7 +124,7 @@ export const getEmployeesByBranch = async (
             return;
         }
 
-        const employees = employeeService.getEmployeesByBranch(branchId);
+        const employees = await employeeService.getEmployeesByBranch(branchId);
         res.status(200).json(successResponse(employees, `Employees for branch ${branchId} retrieved successfully`));
     } catch (error: unknown) {
         next(error);
@@ -144,7 +144,7 @@ export const getEmployeesByDepartment = async (
             return;
         }
 
-        const employees = employeeService.getEmployeesByDepartment(department);
+        const employees = await employeeService.getEmployeesByDepartment(department);
         res.status(200).json(successResponse(employees, `Employees in department ${department} retrieved successfully`));
     } catch (error: unknown) {
         next(error);

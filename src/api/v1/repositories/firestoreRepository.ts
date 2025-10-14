@@ -1,92 +1,97 @@
 import { db } from "../../../../config/firebaseConfig";
 
-export const createDocument = async <T>(
-  collection: string,
-  data: Omit<T, "id">
-): Promise<T> => {
+export const createDocument = async <T>(collectionName: string, data: Omit<T, 'id'>): Promise<T> => {
   try {
-    const docRef = await db.collection(collection).add({
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+
+    const docRef = await db.collection(collectionName).add({
       ...data,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
-    
+
     const doc = await docRef.get();
     return {
       id: docRef.id,
-      ...doc.data(),
+      ...(doc.data() as any),
     } as T;
   } catch (error) {
-    throw new Error(`Failed to create document in ${collection}: ${error}`);
+    throw new Error(`Failed to create document: ${error}`);
   }
 };
 
-export const getDocuments = async <T>(collection: string): Promise<T[]> => {
+export const getDocuments = async <T>(collectionName: string): Promise<T[]> => {
   try {
-    const snapshot = await db.collection(collection).get();
-    return snapshot.docs.map(doc => ({
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+
+    const snapshot = await db.collection(collectionName).get();
+    return snapshot.docs.map((doc: any) => ({
       id: doc.id,
       ...doc.data(),
     })) as T[];
   } catch (error) {
-    throw new Error(`Failed to get documents from ${collection}: ${error}`);
+    throw new Error(`Failed to get documents: ${error}`);
   }
 };
 
-export const getDocumentById = async <T>(
-  collection: string,
-  id: string
-): Promise<T | null> => {
+export const getDocumentById = async <T>(collectionName: string, id: string): Promise<T | null> => {
   try {
-    const doc = await db.collection(collection).doc(id).get();
-    
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+
+    const doc = await db.collection(collectionName).doc(id).get();
     if (!doc.exists) {
       return null;
     }
-    
     return {
       id: doc.id,
-      ...doc.data(),
+      ...(doc.data() as any),
     } as T;
   } catch (error) {
-    throw new Error(`Failed to get document from ${collection}: ${error}`);
+    throw new Error(`Failed to get document: ${error}`);
   }
 };
 
-export const updateDocument = async <T>(
-  collection: string,
-  id: string,
-  data: Partial<T>
-): Promise<T | null> => {
+export const updateDocument = async <T>(collectionName: string, id: string, data: Partial<T>): Promise<T | null> => {
   try {
-    const docRef = db.collection(collection).doc(id);
-    
-    await docRef.update({
-      ...data,
-      updatedAt: new Date(),
-    });
-    
-    const updatedDoc = await docRef.get();
-    
-    if (!updatedDoc.exists) {
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+
+    const docRef = db.collection(collectionName).doc(id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
       return null;
     }
-    
+
+    await docRef.update({
+      ...data,
+      updatedAt: new Date().toISOString(),
+    });
+
+    const updatedDoc = await docRef.get();
     return {
       id: updatedDoc.id,
-      ...updatedDoc.data(),
+      ...(updatedDoc.data() as any),
     } as T;
   } catch (error) {
-    throw new Error(`Failed to update document in ${collection}: ${error}`);
+    throw new Error(`Failed to update document: ${error}`);
   }
 };
 
-export const deleteDocument = async (
-  collection: string,
-  id: string
-): Promise<boolean> => {
+export const deleteDocument = async (collectionName: string, id: string): Promise<boolean> => {
   try {
-    const docRef = db.collection(collection).doc(id);
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+    
+    const docRef = db.collection(collectionName).doc(id);
     const doc = await docRef.get();
     
     if (!doc.exists) {
@@ -96,6 +101,6 @@ export const deleteDocument = async (
     await docRef.delete();
     return true;
   } catch (error) {
-    throw new Error(`Failed to delete document from ${collection}: ${error}`);
+    throw new Error(`Failed to delete document: ${error}`);
   }
 };

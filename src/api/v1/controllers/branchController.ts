@@ -10,9 +10,10 @@ export const getAllBranches = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const branches = branchService.getAllBranches();
+        const branches = await branchService.getAllBranches();
         res.status(200).json(successResponse(branches, "Branches retrieved successfully"));
     } catch (error: unknown) {
+        console.error('Error in getAllBranches:', error);
         next(error);
     }
 };
@@ -24,7 +25,7 @@ export const getBranchById = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const branch = branchService.getBranchById(id);
+        const branch = await branchService.getBranchById(id);
         
         if (branch) {
             res.status(200).json(successResponse(branch, "Branch found"));
@@ -54,7 +55,7 @@ export const createBranch = async (
         }
         
         const branchData: Branch = req.body;
-        const newBranch = branchService.createBranch(branchData);
+        const newBranch = await branchService.createBranch(branchData);
         res.status(201).json(successResponse(newBranch, "Branch created successfully"));
     } catch (error: unknown) {
         next(error);
@@ -79,7 +80,7 @@ export const updateBranch = async (
         }
            
         const { id } = req.params;
-        const updatedBranch = branchService.updateBranch(id, req.body);
+        const updatedBranch = await branchService.updateBranch(id, req.body);
         
         if (updatedBranch) {
             res.status(200).json(successResponse(updatedBranch, "Branch updated successfully"));

@@ -5,10 +5,10 @@ import app from "../src/app";
 describe("Employee API Endpoints", () => {
   const testEmployee = {
     name: "Test Employee",
-    position: "Test Position",
+    position: "Senior Developer",
     department: "Test Department",
     email: "test@example.com",
-    phone: "555-123-9999",
+    phone: "555-999-9999",
     branchId: "1"
   };
 
@@ -67,7 +67,7 @@ describe("Employee API Endpoints", () => {
 
   describe("PUT /api/v1/employees/:id", () => {
     it("should update employee successfully", async () => {
-      const updateData = { position: "Senior Developer", phone: "555-9999" };
+      const updateData = { position: "Test Position", phone: "555-123-9999" };
       
       const response = await request(app)
         .put("/api/v1/employees/1")
@@ -81,7 +81,7 @@ describe("Employee API Endpoints", () => {
     it("should return 404 when updating non-existent employee", async () => {
       const response = await request(app)
         .put("/api/v1/employees/999")
-        .send({ position: "New Position" })
+        .send({ position: "Senior Developer" })
         .expect(404);
 
       expect(response.body).toHaveProperty("message", "Employee not found");
