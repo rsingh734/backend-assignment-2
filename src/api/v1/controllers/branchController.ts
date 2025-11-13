@@ -1,113 +1,112 @@
-import { Request, Response } from "express";
-import { HTTP_STATUS } from "../../../constants/httpConstants";
+import { Request, Response, NextFunction } from "express";
 import * as branchService from "../services/branchServices";
+import { successResponse, errorResponse } from "../models/responseModel";
+import { Branch } from "../models/branchModel";
+import { createBranchSchema, updateBranchSchema } from "../validation/branchValidators";
 
-export const getAllBranches = (req: Request, res: Response): void => {
-  try {
-    const branches = branchService.getAllBranches();
-    res.status(HTTP_STATUS.OK).json({
-      message: "Branches retrieved successfully",
-      data: branches,
-    });
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to retrieve branches",
-    });
-  }
+export const getAllBranches = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const branches = await branchService.getAllBranches();
+        res.status(200).json(successResponse(branches, "Branches retrieved successfully"));
+    } catch (error: unknown) {
+        console.error('Error in getAllBranches:', error);
+        next(error);
+    }
 };
 
-export const getBranchById = (req: Request, res: Response): void => {
-  try {
-    const { id } = req.params;
-    const branch = branchService.getBranchById(id);
-    
-    if (branch) {
-      res.status(HTTP_STATUS.OK).json({
-        message: "Branch found",
-        data: branch,
-      });
-    } else {
-      res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "Branch not found",
-      });
+export const getBranchById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const branch = await branchService.getBranchById(id);
+        
+        if (branch) {
+            res.status(200).json(successResponse(branch, "Branch found"));
+        } else {
+            res.status(404).json(errorResponse("NOT_FOUND", "Branch not found"));
+        }
+    } catch (error: unknown) {
+        next(error);
     }
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to retrieve branch",
-    });
-  }
 };
 
-export const createBranch = (req: Request, res: Response): void => {
-  try {
-    const { name, address, phone } = req.body;
-
-    if (!name || !address || !phone) {
-      res.status(HTTP_STATUS.BAD_REQUEST).json({
-        message: "All fields are required: name, address, phone",
-      });
-      return;
+export const createBranch = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { error} = createBranchSchema.validate(req.body, { abortEarly: false });
+  
+        if (error) {
+            res.status(400).json(errorResponse(
+                "VALIDATION_ERROR", 
+                "Validation failed",
+                error.details.map(d => d.message).join(", ")
+            ));
+            return;
+        }
+        
+        const branchData: Branch = req.body;
+        const newBranch = await branchService.createBranch(branchData);
+        res.status(201).json(successResponse(newBranch, "Branch created successfully"));
+    } catch (error: unknown) {
+        next(error);
     }
-
-    const newBranch = branchService.createBranch({
-      name,
-      address,
-      phone,
-    });
-
-    res.status(HTTP_STATUS.CREATED).json({
-      message: "Branch created successfully",
-      data: newBranch,
-    });
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to create branch",
-    });
-  }
 };
 
-export const updateBranch = (req: Request, res: Response): void => {
-  try {
-    const { id } = req.params;
-    const { name, address, phone } = req.body;
-
-    const updateData = { name, address, phone };
-    const updatedBranch = branchService.updateBranch(id, updateData);
-    
-    if (updatedBranch) {
-      res.status(HTTP_STATUS.OK).json({
-        message: "Branch updated successfully",
-        data: updatedBranch,
-      });
-    } else {
-      res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "Branch not found",
-      });
+export const updateBranch = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { error } = updateBranchSchema.validate(req.body, { abortEarly: false });
+  
+        if (error) {
+            res.status(400).json(errorResponse(
+                "VALIDATION_ERROR", 
+                "Validation failed",
+                error.details.map(d => d.message).join(", ")
+            ));
+            return;
+        }
+           
+        const { id } = req.params;
+        const updatedBranch = await branchService.updateBranch(id, req.body);
+        
+        if (updatedBranch) {
+            res.status(200).json(successResponse(updatedBranch, "Branch updated successfully"));
+        } else {
+            res.status(404).json(errorResponse("NOT_FOUND", "Branch not found"));
+        }
+    } catch (error: unknown) {
+        next(error);
     }
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to update branch",
-    });
-  }
 };
 
-export const deleteBranch = (req: Request, res: Response): void => {
-  try {
-    const { id } = req.params;
-    const result = branchService.deleteBranch(id);
-    
-    if (result) {
-      res.status(HTTP_STATUS.OK).json({
-        message: "Branch deleted successfully",
-      });
-    } else {
-      res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "Branch not found",
-      });
+export const deleteBranch = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const result = await branchService.deleteBranch(id);
+        
+        if (result) {
+            res.status(200).json(successResponse({}, "Branch deleted successfully"));
+        } else {
+            res.status(404).json(errorResponse("NOT_FOUND", "Branch not found"));
+        }
+    } catch (error: unknown) {
+        next(error);
     }
-  } catch (error) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to delete branch",
-    });
-  }
 };

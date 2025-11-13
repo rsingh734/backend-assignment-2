@@ -1,38 +1,50 @@
-// src/api/v1/services/branchService.ts
-import { Branch, branches } from "../../../data/branches";
+import { 
+  createDocument, 
+  getDocuments, 
+  getDocumentById, 
+  updateDocument, 
+  deleteDocument 
+} from "../repositories/firestoreRepository";
+import { Branch } from "../models/branchModel";
 
-export const getAllBranches = (): Branch[] => {
-  return structuredClone(branches);
+const COLLECTION_NAME = 'branches';
+
+export const createBranch = async (data: Omit<Branch, 'id'>): Promise<Branch> => {
+  try {
+    return await createDocument<Branch>(COLLECTION_NAME, data);
+  } catch (error) {
+    throw new Error(`Failed to create branch: ${error}`);
+  }
 };
 
-export const getBranchById = (id: string): Branch | undefined => {
-  return branches.find(branch => branch.id === id);
+export const getAllBranches = async (): Promise<Branch[]> => {
+  try {
+    return await getDocuments<Branch>(COLLECTION_NAME);
+  } catch (error) {
+    throw new Error(`Failed to retrieve branches: ${error}`);
+  }
 };
 
-export const createBranch = (branchData: Omit<Branch, "id">): Branch => {
-  const newBranch: Branch = {
-    id: (branches.length + 1).toString(),
-    ...branchData,
-  };
-  branches.push(newBranch);
-  return newBranch;
+export const getBranchById = async (id: string): Promise<Branch | null> => {
+  try {
+    return await getDocumentById<Branch>(COLLECTION_NAME, id);
+  } catch (error) {
+    throw new Error(`Failed to retrieve branch ${id}: ${error}`);
+  }
 };
 
-export const updateBranch = (
-  id: string,
-  branchData: Partial<Omit<Branch, "id">>
-): Branch | undefined => {
-  const index = branches.findIndex(branch => branch.id === id);
-  if (index === -1) return undefined;
-
-  branches[index] = { ...branches[index], ...branchData };
-  return branches[index];
+export const updateBranch = async (id: string, data: Partial<Branch>): Promise<Branch | null> => {
+  try {
+    return await updateDocument<Branch>(COLLECTION_NAME, id, data);
+  } catch (error) {
+    throw new Error(`Failed to update branch ${id}: ${error}`);
+  }
 };
 
-export const deleteBranch = (id: string): boolean => {
-  const index = branches.findIndex(branch => branch.id === id);
-  if (index === -1) return false;
-
-  branches.splice(index, 1);
-  return true;
+export const deleteBranch = async (id: string): Promise<boolean> => {
+  try {
+    return await deleteDocument(COLLECTION_NAME, id);
+  } catch (error) {
+    throw new Error(`Failed to delete branch ${id}: ${error}`);
+  }
 };

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-     "start": "ts-node src/server.ts",
+    "start": "ts-node src/server.ts",
     "dev": "ts-node src/server.ts",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -36,6 +36,8 @@
   "dependencies": {
     "@types/express": "^5.0.3",
     "express": "^5.1.0",
+    "firebase-admin": "^13.5.0",
+    "joi": "^18.0.1",
     "morgan": "^1.10.1"
   }
 }

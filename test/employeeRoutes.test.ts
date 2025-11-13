@@ -5,12 +5,31 @@ import app from "../src/app";
 describe("Employee API Endpoints", () => {
   const testEmployee = {
     name: "Test Employee",
-    position: "Test Position",
+    position: "Senior Developer",
     department: "Test Department",
     email: "test@example.com",
-    phone: "555-1234",
+    phone: "555-999-9999",
     branchId: "1"
   };
+
+  let createdEmployeeId: string;
+  let createdEmployeeId2: string;
+
+  beforeAll(async () => {
+    // Create an employee for testing GET, PUT, DELETE
+    const createResponse = await request(app)
+      .post("/api/v1/employees")
+      .send(testEmployee)
+      .expect(201);
+    createdEmployeeId = createResponse.body.data.id;
+
+    // Create another employee for DELETE test
+    const createResponse2 = await request(app)
+      .post("/api/v1/employees")
+      .send({ ...testEmployee, name: "Test Employee 2" })
+      .expect(201);
+    createdEmployeeId2 = createResponse2.body.data.id;
+  });
 
   describe("POST /api/v1/employees", () => {
     it("should create a new employee successfully", async () => {
@@ -27,10 +46,11 @@ describe("Employee API Endpoints", () => {
     it("should return 400 when required parameters are missing", async () => {
       const response = await request(app)
         .post("/api/v1/employees")
-        .send({ name: "Incomplete Employee" })
+        .send({ name: "Incomplete Employee", position: "Tester" })
         .expect(400);
 
       expect(response.body).toHaveProperty("message");
+      expect(response.body).toHaveProperty("errors");
     });
   });
 
@@ -48,11 +68,11 @@ describe("Employee API Endpoints", () => {
   describe("GET /api/v1/employees/:id", () => {
     it("should return specific employee by ID", async () => {
       const response = await request(app)
-        .get("/api/v1/employees/1")
+        .get(`/api/v1/employees/${createdEmployeeId}`)
         .expect(200);
 
       expect(response.body).toHaveProperty("message", "Employee found");
-      expect(response.body.data).toHaveProperty("id", "1");
+      expect(response.body.data).toHaveProperty("id", createdEmployeeId);
     });
 
     it("should return 404 for non-existent employee ID", async () => {
@@ -66,10 +86,10 @@ describe("Employee API Endpoints", () => {
 
   describe("PUT /api/v1/employees/:id", () => {
     it("should update employee successfully", async () => {
-      const updateData = { position: "Senior Developer", phone: "555-9999" };
-      
+      const updateData = { position: "Test Position", phone: "555-123-9999" };
+
       const response = await request(app)
-        .put("/api/v1/employees/1")
+        .put(`/api/v1/employees/${createdEmployeeId}`)
         .send(updateData)
         .expect(200);
 
@@ -80,7 +100,7 @@ describe("Employee API Endpoints", () => {
     it("should return 404 when updating non-existent employee", async () => {
       const response = await request(app)
         .put("/api/v1/employees/999")
-        .send({ position: "New Position" })
+        .send({ position: "Senior Developer" })
         .expect(404);
 
       expect(response.body).toHaveProperty("message", "Employee not found");
@@ -90,7 +110,7 @@ describe("Employee API Endpoints", () => {
   describe("DELETE /api/v1/employees/:id", () => {
     it("should delete employee successfully", async () => {
       const response = await request(app)
-        .delete("/api/v1/employees/2")
+        .delete(`/api/v1/employees/${createdEmployeeId2}`)
         .expect(200);
 
       expect(response.body).toHaveProperty("message", "Employee deleted successfully");

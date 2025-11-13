@@ -1,48 +1,70 @@
-// src/api/v1/services/employeeService.ts
-import { Employee, employees } from "../../../data/employees";
+import { 
+  createDocument, 
+  getDocuments, 
+  getDocumentById, 
+  updateDocument, 
+  deleteDocument 
+} from "../repositories/firestoreRepository";
+import { Employee } from "../models/employeeModel";
 
-export const getAllEmployees = (): Employee[] => {
-  return structuredClone(employees);
+const COLLECTION_NAME = "employees";
+
+export const getAllEmployees = async (): Promise<Employee[]> => {
+  try {
+    return await getDocuments<Employee>(COLLECTION_NAME);
+  } catch (error) {
+    throw new Error(`Failed to retrieve employees: ${error}`);
+  }
 };
 
-export const getEmployeeById = (id: string): Employee | undefined => {
-  return employees.find(employee => employee.id === id);
+export const getEmployeeById = async (id: string): Promise<Employee | null> => {
+  try {
+    return await getDocumentById<Employee>(COLLECTION_NAME, id);
+  } catch (error) {
+    throw new Error(`Failed to retrieve employee ${id}: ${error}`);
+  }
 };
 
-export const createEmployee = (employeeData: Omit<Employee, "id">): Employee => {
-  const newEmployee: Employee = {
-    id: (employees.length + 1).toString(),
-    ...employeeData,
-  };
-  employees.push(newEmployee);
-  return newEmployee;
+export const createEmployee = async (data: Employee): Promise<Employee> => {
+  try {
+    return await createDocument<Employee>(COLLECTION_NAME, data);
+  } catch (error) {
+    throw new Error(`Failed to create employee: ${error}`);
+  }
 };
 
-export const updateEmployee = (
-  id: string,
-  employeeData: Partial<Omit<Employee, "id">>
-): Employee | undefined => {
-  const index = employees.findIndex(employee => employee.id === id);
-  if (index === -1) return undefined;
-
-  employees[index] = { ...employees[index], ...employeeData };
-  return employees[index];
+export const updateEmployee = async (id: string, data: Partial<Employee>): Promise<Employee | null> => {
+  try {
+    return await updateDocument<Employee>(COLLECTION_NAME, id, data);
+  } catch (error) {
+    throw new Error(`Failed to update employee ${id}: ${error}`);
+  }
 };
 
-export const deleteEmployee = (id: string): boolean => {
-  const index = employees.findIndex(employee => employee.id === id);
-  if (index === -1) return false;
-
-  employees.splice(index, 1);
-  return true;
+export const deleteEmployee = async (id: string): Promise<boolean> => {
+  try {
+    return await deleteDocument(COLLECTION_NAME, id);
+  } catch (error) {
+    throw new Error(`Failed to delete employee ${id}: ${error}`);
+  }
 };
 
-export const getEmployeesByBranch = (branchId: string): Employee[] => {
-  return employees.filter(employee => employee.branchId === branchId);
+export const getEmployeesByBranch = async (branchId: string): Promise<Employee[]> => {
+  try {
+    const allEmployees = await getDocuments<Employee>(COLLECTION_NAME);
+    return allEmployees.filter(employee => employee.branchId === branchId);
+  } catch (error) {
+    throw new Error(`Failed to retrieve employees for branch ${branchId}: ${error}`);
+  }
 };
 
-export const getEmployeesByDepartment = (department: string): Employee[] => {
-  return employees.filter(employee => 
-    employee.department.toLowerCase() === department.toLowerCase()
-  );
+export const getEmployeesByDepartment = async (department: string): Promise<Employee[]> => {
+  try {
+    const allEmployees = await getDocuments<Employee>(COLLECTION_NAME);
+    return allEmployees.filter(employee => 
+      employee.department.toLowerCase() === department.toLowerCase()
+    );
+  } catch (error) {
+    throw new Error(`Failed to retrieve employees for department ${department}: ${error}`);
+  }
 };
