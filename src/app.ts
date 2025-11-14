@@ -1,5 +1,9 @@
 // src/app.ts
 import express, { Express } from "express";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 import morgan from "morgan";
 import employeeRoutes from "./api/v1/routes/employeeRoutes";
 import branchRoutes from "./api/v1/routes/branchRoutes";
