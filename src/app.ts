@@ -4,15 +4,19 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-import helmet from "helmet";
+import { getHelmetConfig } from "../config/helmetConfig";
+import { getCorsOptions } from "../config/corsConfig";
+import cors from "cors";
 import morgan from "morgan";
 import employeeRoutes from "./api/v1/routes/employeeRoutes";
 import branchRoutes from "./api/v1/routes/branchRoutes";
 
 const app: Express = express();
 
+app.use(cors(getCorsOptions()));
+
 // Apply basic Helmet security
-app.use(helmet());
+app.use(getHelmetConfig());
 
 // Use morgan for HTTP request logging
 app.use(morgan("combined"));

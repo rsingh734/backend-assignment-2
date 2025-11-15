@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/rsingh734/backend-assignment-2#readme",
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
     "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
@@ -37,6 +38,7 @@
   },
   "dependencies": {
     "@types/express": "^5.0.3",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "firebase-admin": "^13.5.0",
     "helmet": "^8.1.0",
