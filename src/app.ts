@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+import setupSwagger from "../config/swagger";
 import { getHelmetConfig } from "../config/helmetConfig";
 import { getCorsOptions } from "../config/corsConfig";
 import cors from "cors";
@@ -14,6 +15,9 @@ import branchRoutes from "./api/v1/routes/branchRoutes";
 const app: Express = express();
 
 app.use(cors(getCorsOptions()));
+
+// Setup Swagger UI
+setupSwagger(app);
 
 // Apply basic Helmet security
 app.use(getHelmetConfig());
