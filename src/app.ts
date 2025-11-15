@@ -4,11 +4,15 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+import helmet from "helmet";
 import morgan from "morgan";
 import employeeRoutes from "./api/v1/routes/employeeRoutes";
 import branchRoutes from "./api/v1/routes/branchRoutes";
 
 const app: Express = express();
+
+// Apply basic Helmet security
+app.use(helmet());
 
 // Use morgan for HTTP request logging
 app.use(morgan("combined"));
