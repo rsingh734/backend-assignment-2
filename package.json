@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "generate-docs": "ts-node scripts/generate-openapi.ts && npx @redocly/cli build-docs openapi.json --output docs/index.html",
     "start": "ts-node src/server.ts",
     "dev": "ts-node src/server.ts",
     "test": "jest",
@@ -23,21 +24,31 @@
   },
   "homepage": "https://github.com/rsingh734/backend-assignment-2#readme",
   "devDependencies": {
+    "@redocly/cli": "^2.11.1",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
     "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.5.2",
     "@types/supertest": "^6.0.3",
-    "jest": "^30.2.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "dotenv": "^17.2.3",
+    "jest": "^29.0.0",
     "supertest": "^7.1.4",
-    "ts-jest": "^29.4.4",
+    "ts-jest": "^29.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
   "dependencies": {
     "@types/express": "^5.0.3",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "firebase-admin": "^13.5.0",
+    "helmet": "^8.1.0",
     "joi": "^18.0.1",
-    "morgan": "^1.10.1"
+    "morgan": "^1.10.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
